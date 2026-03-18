@@ -127,7 +127,7 @@ def generate_report_pdf(d):
     now_str = datetime.datetime.now().strftime("%d %B %Y, %I:%M %p")
     banner = Table([[
         [P("<b>EcoPredict</b>", fontSize=20, textColor=colors.white, fontName="Helvetica-Bold"),
-         P("Air Quality Report", fontSize=10, textColor=colors.HexColor("#94a3b8"))],
+         P("", fontSize=10, textColor=colors.HexColor("#94a3b8"))],
         P("Generated: " + now_str, fontSize=9,
           textColor=colors.HexColor("#94a3b8"), alignment=2)
     ]], colWidths=[W * 0.6, W * 0.4])
