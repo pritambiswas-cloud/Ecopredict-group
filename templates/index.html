@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoPredict - AI Air Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="text-slate-800 bg-slate-50 min-h-screen">
+
+    <nav class="flex items-center justify-between px-10 py-5 bg-white/40 backdrop-blur-md sticky top-0 z-50 border-b border-white/20">
+        <div class="flex items-center gap-2">
+            <div class="w-8 h-8 bg-teal-500 rounded-lg flex items-center justify-center text-white">
+                <i class="fas fa-leaf"></i>
+            </div>
+            <span class="text-2xl font-bold text-slate-700 tracking-tight">EcoPredict</span>
+        </div>
+        <div class="hidden md:flex gap-8 font-medium text-slate-600">
+            <a href="/" class="hover:text-teal-600 transition-colors">Home</a>
+            <a href="/dashboard" class="hover:text-teal-600 transition-colors">Dashboard</a>
+            <a href="/forecast" class="hover:text-teal-600 transition-colors">AI Forecast</a>
+        </div>
+    </nav>
+
+    <header class="max-w-7xl mx-auto px-6 py-20 text-left">
+        <div class="max-w-3xl">
+            <h1 class="text-6xl font-extrabold text-slate-900 leading-tight mb-4">
+                EcoPredict: AI-Powered <br> Air Quality Intelligence
+            </h1>
+            <p class="text-2xl text-slate-700 font-medium mb-1">Stay Informed. Plan Ahead.</p>
+            <p class="text-lg text-slate-500">Deep analysis of gases, pollutants, and safety recommendations.</p>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-8 mb-24">
+        
+        <div class="glass-card p-8 rounded-3xl shadow-xl flex flex-col bg-white/70 backdrop-blur-md border border-white">
+            <div class="flex justify-center mb-8">
+                <img src="https://cdn-icons-png.flaticon.com/512/854/854878.png" class="h-24 object-contain" alt="map">
+            </div>
+            <h3 class="text-2xl font-bold mb-4">Deep Search</h3>
+            <p class="text-sm text-slate-500 mb-6 text-center">Enter a city for full gas breakdown & source analysis.</p>
+            
+            <div class="flex gap-2 mb-4">
+                <input type="text" id="cityInput" placeholder="Enter City (e.g., Delhi)"
+                    class="flex-1 px-4 py-2 rounded-lg border border-slate-200 bg-white/50 text-sm focus:ring-2 focus:ring-teal-400 outline-none">
+                <button id="searchBtn" class="bg-teal-500 text-white px-4 py-2 rounded-lg hover:bg-teal-600 transition-colors">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+
+            <div id="statusMessage" class="text-center text-xs font-bold text-slate-400 mb-8 uppercase tracking-widest">
+                Waiting for input...
+            </div>
+
+            <button onclick="document.getElementById('searchBtn').click()" class="w-full py-4 rounded-full bg-teal-500 text-white font-bold mt-auto hover:bg-teal-600">Analyze Air</button>
+        </div>
+
+        <div class="glass-card p-8 rounded-3xl shadow-xl flex flex-col bg-white/70 backdrop-blur-md border border-white">
+            <div class="flex justify-center mb-8">
+                <img src="https://cdn-icons-png.flaticon.com/512/3589/3589868.png" class="h-24 object-contain" alt="dashboard">
+            </div>
+            <h3 class="text-2xl font-bold mb-3">Metro Monitor</h3>
+            <p class="text-slate-600 leading-relaxed mb-8">Live AQI comparison of the world's major mega-cities.</p>
+            <a href="/dashboard" class="w-full py-4 rounded-full bg-teal-500 text-white text-center font-bold mt-auto hover:bg-teal-600">View Dashboard</a>
+        </div>
+
+        <div class="glass-card p-8 rounded-3xl shadow-xl flex flex-col bg-white/70 backdrop-blur-md border border-white">
+            <div class="flex justify-center mb-8">
+                <img src="https://cdn-icons-png.flaticon.com/512/2103/2103633.png" class="h-24 object-contain" alt="AI">
+            </div>
+            <h3 class="text-2xl font-bold mb-3">AI Predictor</h3>
+            <p class="text-slate-600 leading-relaxed mb-8">72-hour air trend forecasts powered by machine learning.</p>
+            <a href="/forecast" class="w-full py-4 rounded-full bg-teal-500 text-white text-center font-bold mt-auto hover:bg-teal-600 block transition-all">Get Forecast</a>
+        </div>
+
+    </main>
+
+    <script>
+        document.getElementById('searchBtn').addEventListener('click', async () => {
+            const cityInput = document.getElementById('cityInput');
+            const statusMsg = document.getElementById('statusMessage');
+            const city = cityInput.value.trim();
+
+            if (!city) {
+                alert("Please enter a city name!");
+                return;
+            }
+
+            statusMsg.innerText = "Analyzing Atmosphere...";
+            statusMsg.classList.add("text-teal-600", "animate-pulse");
+
+            try {
+                const response = await fetch('/api/search', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ city: city })
+                });
+
+                const data = await response.json();
+
+                if (response.ok && data.redirect) {
+                    // This is the magic line that takes you to the new Deep Analysis page
+                    window.location.href = data.redirect;
+                } else {
+                    statusMsg.innerText = data.error || "City not found!";
+                    statusMsg.classList.remove("text-teal-600", "animate-pulse");
+                    statusMsg.classList.add("text-red-500");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                statusMsg.innerText = "Server Error. Try again.";
+                statusMsg.classList.remove("text-teal-600", "animate-pulse");
+            }
+        });
+
+        // Allow "Enter" key to trigger search
+        document.getElementById('cityInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                document.getElementById('searchBtn').click();
+            }
+        });
+    </script>
+</body>
+</html>
